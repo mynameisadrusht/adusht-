@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Roller Deluxe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Lobster&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-family: 'Lobster', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        .dice-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(20, 30, 48, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dice-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .dice {
+            width: 100px;
+            height: 100px;
+            background: #f8f8f8;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            font-weight: bold;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .dice:hover {
+            transform: scale(1.05);
+        }
+        
+        .dice::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dice-value {
+            position: relative;
+            z-index: 1;
+            color: #1a2a6c;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 75, 43, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .roll-count {
+            background: linear-gradient(to right, #36d1dc, #5b86e5);
+        }
+        
+        .history-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(20, 30, 48, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ffcc00;
+        }
+        
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffcc00;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        .rolling {
+            animation: rollAnimation 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes rollAnimation {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(0.9); }
+            75% { transform: rotate(270deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dice-1 .dice-value::after { content: "⚀"; }
+        .dice-2 .dice-value::after { content: "⚁"; }
+        .dice-3 .dice-value::after { content: "⚂"; }
+        .dice-4 .dice-value::after { content: "⚃"; }
+        .dice-5 .dice-value::after { content: "⚄"; }
+        .dice-6 .dice-value::after { content: "⚅"; }
+        
+        .winner {
+            animation: winnerAnimation 2s infinite;
+        }
+        
+        @keyframes winnerAnimation {
+            0% { transform: scale(1); box-shadow: 0 0 10px gold; }
+            50% { transform: scale(1.1); box-shadow: 0 0 30px gold; }
+            100% { transform: scale(1); box-shadow: 0 0 10px gold; }
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .dice {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dice Roller Deluxe</h1>
+            <p class="subtitle">Roll the dice and test your luck!</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="dice-section">
+                <h2 class="section-title">Roll the Dice</h2>
+                
+                <div class="dice-container">
+                    <div class="dice dice-1">
+                        <div class="dice-value"></div>
+                    </div>
+                    <div class="dice dice-2">
+                        <div class="dice-value"></div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="roll-btn">Roll Dice</button>
+                    <button id="double-btn" class="roll-count">Roll Double</button>
+                    <button id="reset-btn">Reset Game</button>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <h2 class="section-title">Roll History</h2>
+                <div class="history-list" id="history-list">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Rolls</div>
+                <div class="stat-value" id="total-rolls">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Current Streak</div>
+                <div class="stat-value" id="current-streak">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Highest Roll</div>
+                <div class="stat-value" id="highest-roll">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Doubles Rolled</div>
+                <div class="stat-value" id="double-count">0</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Dice Roller Deluxe | Full-stack game with animations</p>
+        </footer>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            dice1: 1,
+            dice2: 1,
+            history: [],
+            totalRolls: 0,
+            currentStreak: 0,
+            highestRoll: 0,
+            doubleCount: 0
+        };
+        
+        // DOM elements
+        const diceElements = document.querySelectorAll('.dice');
+        const rollBtn = document.getElementById('roll-btn');
+        const doubleBtn = document.getElementById('double-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const historyList = document.getElementById('history-list');
+        const totalRollsEl = document.getElementById('total-rolls');
+        const currentStreakEl = document.getElementById('current-streak');
+        const highestRollEl = document.getElementById('highest-roll');
+        const doubleCountEl = document.getElementById('double-count');
+        
+        // Initialize game
+        function initGame() {
+            updateDice();
+            updateStats();
+            renderHistory();
+            
+            // Add event listeners
+            rollBtn.addEventListener('click', rollDice);
+            doubleBtn.addEventListener('click', rollDouble);
+            resetBtn.addEventListener('click', resetGame);
+            
+            // Add dice click handlers
+            diceElements.forEach(dice => {
+                dice.addEventListener('click', () => {
+                    const diceIndex = Array.from(diceElements).indexOf(dice);
+                    rerollSingleDice(diceIndex);
+                });
+            });
+        }
+        
+        // Roll both dice
+        function rollDice() {
+            // Add rolling animation
+            diceElements.forEach(dice => {
+                dice.classList.add('rolling');
+                
+                // Remove animation after it completes
+                setTimeout(() => {
+                    dice.classList.remove('rolling');
+                }, 800);
+            });
+            
+            // Generate new values after a short delay
+            setTimeout(() => {
+                gameState.dice1 = Math.floor(Math.random() * 6) + 1;
+                gameState.dice2 = Math.floor(Math.random() * 6) + 1;
+                
+                updateGameState();
+                updateDice();
+                updateStats();
+                renderHistory();
+            }, 300);
+        }
+        
+        // Roll until getting doubles
+        function rollDouble() {
+            if (gameState.dice1 === gameState.dice2) {
+                rollDice();
+                return;
+            }
+            
+            // Add rolling animation
+            diceElements.forEach(dice => {
+                dice.classList.add('rolling');
+            });
+            
+            // Simulate multiple rolls for double effect
+            let rolls = 0;
+            const maxRolls = 5;
+            const rollInterval = setInterval(() => {
+                gameState.dice1 = Math.floor(Math.random() * 6) + 1;
+                gameState.dice2 = Math.floor(Math.random() * 6) + 1;
+                updateDice();
+                
+                rolls++;
+                if (rolls >= maxRolls) {
+                    clearInterval(rollInterval);
+                    
+                    // Keep rolling until we get doubles
+                    while (gameState.dice1 !== gameState.dice2) {
+                        gameState.dice1 = Math.floor(Math.random() * 6) + 1;
+                        gameState.dice2 = Math.floor(Math.random() * 6) + 1;
+                    }
+                    
+                    setTimeout(() => {
+                        diceElements.forEach(dice => {
+                            dice.classList.remove('rolling');
+                        });
+                        
+                        updateGameState();
+                        updateDice();
+                        updateStats();
+                        renderHistory();
+                        
+                        // Add winner animation
+                        diceElements.forEach(dice => {
+                            dice.classList.add('winner');
+                            setTimeout(() => {
+                                dice.classList.remove('winner');
+                            }, 2000);
+                        });
+                    }, 300);
+                }
+            }, 200);
+        }
+        
+        // Re-roll a single dice
+        function rerollSingleDice(diceIndex) {
+            const dice = diceElements[diceIndex];
+            dice.classList.add('rolling');
+            
+            setTimeout(() => {
+                dice.classList.remove('rolling');
+                
+                if (diceIndex === 0) {
+                    gameState.dice1 = Math.floor(Math.random() * 6) + 1;
+                } else {
+                    gameState.dice2 = Math.floor(Math.random() * 6) + 1;
+                }
+                
+                updateGameState();
+                updateDice();
+                updateStats();
+                renderHistory();
+            }, 800);
+        }
+        
+        // Reset game state
+        function resetGame() {
+            gameState.dice1 = 1;
+            gameState.dice2 = 1;
+            gameState.history = [];
+            gameState.totalRolls = 0;
+            gameState.currentStreak = 0;
+            gameState.highestRoll = 0;
+            gameState.doubleCount = 0;
+            
+            updateDice();
+            updateStats();
+            renderHistory();
+        }
+        
+        // Update game state after a roll
+        function updateGameState() {
+            const total = gameState.dice1 + gameState.dice2;
+            const isDouble = gameState.dice1 === gameState.dice2;
+            
+            // Add to history
+            gameState.history.unshift({
+                dice1: gameState.dice1,
+                dice2: gameState.dice2,
+                total: total,
+                isDouble: isDouble,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            // Keep only last 10 rolls
+            if (gameState.history.length > 10) {
+                gameState.history.pop();
+            }
+            
+            // Update stats
+            gameState.totalRolls++;
+            
+            if (total > gameState.highestRoll) {
+                gameState.highestRoll = total;
+            }
+            
+            if (isDouble) {
+                gameState.doubleCount++;
+                gameState.currentStreak++;
+            } else {
+                gameState.currentStreak = 0;
+            }
+        }
+        
+        // Update dice display
+        function updateDice() {
+            diceElements[0].className = `dice dice-${gameState.dice1}`;
+            diceElements[1].className = `dice dice-${gameState.dice2}`;
+        }
+        
+        // Update statistics display
+        function updateStats() {
+            totalRollsEl.textContent = gameState.totalRolls;
+            currentStreakEl.textContent = gameState.currentStreak;
+            highestRollEl.textContent = gameState.highestRoll;
+            doubleCountEl.textContent = gameState.doubleCount;
+        }
+        
+        // Render roll history
+        function renderHistory() {
+            historyList.innerHTML = '';
+            
+            gameState.history.forEach(roll => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div>
+                        <span class="dice-value dice-${roll.dice1}"></span> + 
+                        <span class="dice-value dice-${roll.dice2}"></span>
+                    </div>
+                    <div>Total: <strong>${roll.total}</strong></div>
+                    <div>${roll.isDouble ? '🎯 DOUBLE!' : ''}</div>
+                    <div>${roll.timestamp}</div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // Initialize the game when page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+        
+        // Backend simulation (would be a real backend in a full implementation)
+        function simulateBackend() {
+            return {
+                rollDice: () => {
+                    return {
+                        dice1: Math.floor(Math.random() * 6) + 1,
+                        dice2: Math.floor(Math.random() * 6) + 1,
+                        timestamp: new Date().toISOString()
+                    };
+                },
+                saveRoll: (rollData) => {
+                    console.log('Saving roll to backend:', rollData);
+                    // In a real app, this would save to a database
+                    return { success: true };
+                },
+                getHistory: () => {
+                    // In a real app, this would fetch from a database
+                    return gameState.history.slice(0, 10);
+                }
+            };
+        }
+        
+        // Initialize the backend
+        const backend = simulateBackend();
+    </script>
+</body>
+</html>
